@@ -43,6 +43,48 @@
         <p>© 2026 我的书库 | 仅供学习交流使用</p>
     </footer>
 
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+        title="回到顶部"
+        style="
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s, background-color 0.2s;
+            z-index: 999;
+        ">
+        ↑
+    </button>
+
+    <script>
+        const btn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                btn.style.opacity = '1';
+                btn.style.transform = 'translateY(0)';
+            } else {
+                btn.style.opacity = '0';
+                btn.style.transform = 'translateY(10px)';
+            }
+        });
+        btn.addEventListener('mouseenter', () => btn.style.backgroundColor = '#059669');
+        btn.addEventListener('mouseleave', () => btn.style.backgroundColor = '#10b981');
+    </script>
+
     <script>
         // ==================== 书籍数据（在这里添加新书） ====================
         const books = [
@@ -221,6 +263,24 @@
                 desc: "解放军大将黄克诚的自传",
                 img: "images/17.jpg",
                 file: "books/黄克诚自述.epub"
+            }
+                         ,
+            {
+                title: "国家为什么会失败-权力、富裕与贫困的根源",
+                author: "阿西莫格鲁",
+                category: "政治学",
+                desc: "关于好政府与坏政府鉴别",
+                img: "images/18.jpg",
+                file: "books/国家为什么会失败-权力、富裕与贫困的根源.epub"
+            }
+                                     ,
+            {
+                title: "秦制两千年-封建帝王的权力规则",
+                author: "谌旭彬",
+                category: "政治学",
+                desc: "解密秦制的权力运行机制",
+                img: "images/19.jpg",
+                file: "books/秦制两千年-封建帝王的权力规则.epub"
             }
             // 在这里继续添加更多书籍...
         ];
