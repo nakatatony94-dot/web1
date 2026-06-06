@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的书库 - 免费 EPUB 下载</title>
+
+    <!-- Favicon：书本图标，绿色主题 -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <!-- 网站缩略图（分享到社交媒体时显示） -->
+    <meta property="og:title" content="我的书库 - 免费 EPUB 下载">
+    <meta property="og:description" content="精选好书，免费 EPUB 下载">
+    <meta property="og:type" content="website">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .book-card { transition: all 0.3s; }
+        .book-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4); }
+        .active { background-color: #10b981; color: white; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100">
+    <header class="bg-black py-16 text-center">
+        <h1 class="text-6xl font-bold mb-4">电子书库</h1>
+        <p class="text-2xl text-emerald-400">精选好书 · 免费 EPUB 下载</p>
+    </header>
+
+    <!-- 分类筛选按钮 -->
+    <div class="max-w-7xl mx-auto px-6 pt-8">
+        <div class="flex flex-wrap gap-3 justify-center" id="category-filters">
+            <button onclick="filterCategory('all')" class="active px-6 py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-sm font-medium">全部</button>
+            <!-- 其他按钮会由 JS 自动生成 -->
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="books">
+            <!-- 图书卡片会在这里 -->
+        </div>
+    </main>
+
+    <footer class="bg-black py-12 text-center text-zinc-500">
+        <p>© 2026 我的书库 | 仅供学习交流使用</p>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+        title="回到顶部"
+        style="
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s, background-color 0.2s;
+            z-index: 999;
+        ">
+        ↑
+    </button>
+
+    <script>
+        const btn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                btn.style.opacity = '1';
+                btn.style.transform = 'translateY(0)';
+            } else {
+                btn.style.opacity = '0';
+                btn.style.transform = 'translateY(10px)';
+            }
+        });
+        btn.addEventListener('mouseenter', () => btn.style.backgroundColor = '#059669');
+        btn.addEventListener('mouseleave', () => btn.style.backgroundColor = '#10b981');
+    </script>
+
+    <script>
+        // ==================== 书籍数据（在这里添加新书） ====================
+        const books = [
+            {
+                title: "王安忆长篇小说十部",
+                author: "王安忆",
+                category: "小说",
+                desc: "王安忆长篇小说十部。",
+                img: "images/1.jpg",
+                file: "books/王安忆长篇小说十部.epub"
+            },
+            {
+                title: "活着",
+                author: "余华",
+                category: "文学",
+                desc: "福贵的一生，充满苦难却顽强活着。",
+                img: "images/2.jpg",
+                file: "books/活着.epub"
+            },
+            {
+                title: "邱会作回忆录",
+                author: "邱会作",
+                category: "回忆录",
+                desc: "解放军前副总参谋长邱会作中将的回忆",
+                img: "images/3.jpg",
+                file: "books/邱会作回忆录.epub"
+            },
+            {
+                title: "新发现的周恩来",
+                author: "司马清扬和欧阳龙门",
+                category: "传记",
+                desc: "周恩来在文革中的表现",
+                img: "images/4.jpg",
+                file: "books/新发现的周恩来.epub"
+            }
+            ,
+            {
+                title: "龚楚将军回忆录",
+                author: "龚楚",
+                category: "回忆录",
+                desc: "红军早期高级将领的回忆录",
+                img: "images/5.jpg",
+                file: "books/龚楚将军回忆录.epub"
+            }
+             ,
+            {
+                title: "梁启超-亡命(1898-1903)",
+                author: "许知远",
+                category: "传记",
+                desc: "梁启超戊戌政变后的流亡生涯",
+                img: "images/亡命.jpg",
+                file: "books/梁启超-亡命(1898—1903).epub"
+            }
+             ,
+            {
+                title: "十四年：从1931到1945",
+                author: "传记杂志",
+                category: "回忆录",
+                desc: "回顾14年抗战史",
+                img: "images/十四年.jpg",
+                file: "books/十四年-从1931到1945.epub"
+            }
+                         ,
+            {
+                title: "梁启超-青年变革者(1873-1898)",
+                author: "许知远",
+                category: "传记",
+                desc: "梁启超的青年时代",
+                img: "images/青年变革者.jpg",
+                file: "books/梁启超-青年变革者(1873-1898).epub"
+            }
+                                     ,
+            {
+                title: "中国纪事",
+                author: "许知远",
+                category: "纪实",
+                desc: "许知远眼中的中国记事",
+                img: "images/6.jpg",
+                file: "books/中国纪事.epub"
+            }
+                ,
+            {
+                title: "台湾中研院口述民国历史经典丛书(套装共8册)",
+                author: "中研院",
+                category: "纪实",
+                desc: "当事人口述民国历史",
+                img: "images/7.jpg",
+                file: "books/台湾中研院口述民国历史经典丛书(套装共8册).epub"
+            }
+                 ,
+            {
+                title: "红色家族档案",
+                author: "罗点点",
+                category: "回忆录",
+                desc: "解放军前总参谋长罗瑞卿大将女儿回忆录",
+                img: "images/8.jpg",
+                file: "books/红色家族档案.epub"
+            }
+                ,
+            {
+                title: "从战争中走来-两代军人的对话",
+                author: "张胜",
+                category: "回忆录",
+                desc: "解放军前国防部长张爱萍上将的回忆录",
+                img: "images/9.jpg",
+                file: "books/从战争中走来-两代军人的对话.epub"
+            }
+               ,
+            {
+                title: "冯玉祥传（传记文学书系）",
+                author: "传记文学",
+                category: "传记",
+                desc: "民国将领冯玉祥的传记",
+                img: "images/10.jpg",
+                file: "books/冯玉祥传.epub"
+            }
+             ,
+            {
+                title: "李叔同传",
+                author: "王牧",
+                category: "传记",
+                desc: "民国僧人李叔同的传记",
+                img: "images/11.jpg",
+                file: "books/李叔同传.epub"
+            }
+             ,
+            {
+                title: "传记文学四部（传记文学书系）",
+                author: "传记文学",
+                category: "传记",
+                desc: "再见大师、民国三大校长、我们的朋友胡适之、从晚清到民国四部作品",
+                img: "images/12.jpg",
+                file: "books/传记文学四部.epub"
+            }
+                         ,
+            {
+                title: "抉择时刻-乔治沃克布什自传",
+                author: "布什",
+                category: "传记",
+                desc: "美国第41-42任总统乔治沃克布什的自传",
+                img: "images/13.jpg",
+                file: "books/抉择时刻-乔治沃克布什自传.epub"
+            }
+             ,
+            {
+                title: "通往权力之路-撒切尔夫人自传",
+                author: "撒切尔夫人",
+                category: "传记",
+                desc: "英国前首相撒切尔夫人的自传",
+                img: "images/14.jpg",
+                file: "books/通往权力之路-撒切尔夫人自传.epub"
+            }
+             ,
+            {
+                title: "我的一个世纪",
+                author: "董竹君",
+                category: "传记",
+                desc: "上海锦江饭店创始人董竹君的自传",
+                img: "images/15.jpg",
+                file: "books/我的一个世纪.epub"
+            }
+                         ,
+            {
+                title: "最后的贵族",
+                author: "章诒和",
+                category: "传记",
+                desc: "章诒和的自传",
+                img: "images/16.jpg",
+                file: "books/最后的贵族.mobi"
+            }
+             ,
+            {
+                title: "黄克诚自述",
+                author: "黄克诚",
+                category: "传记",
+                desc: "解放军大将黄克诚的自传",
+                img: "images/17.jpg",
+                file: "books/黄克诚自述.epub"
+            }
+                         ,
+            {
+                title: "国家为什么会失败-权力、富裕与贫困的根源",
+                author: "阿西莫格鲁",
+                category: "政治学",
+                desc: "关于好政府与坏政府鉴别",
+                img: "images/18.jpg",
+                file: "books/国家为什么会失败-权力、富裕与贫困的根源.epub"
+            }
+                 ,
+            {
+                title: "秦制两千年-封建帝王的权力规则",
+                author: "谌旭彬",
+                category: "政治学",
+                desc: "解密秦制的权力运行机制",
+                img: "images/19.jpg",
+                file: "books/秦制两千年-封建帝王的权力规则.epub"
+            }
+                ,
+            {
+                title: "反乌托邦小说三部曲",
+                author: "奥威尔、赫胥黎、扎米亚金",
+                category: "政治学",
+                desc: "1984、美丽新世界、我们",
+                img: "images/20.jpg",
+                file: "books/反乌托邦小说三部曲.epub"
+            }
+              ,
+            {
+                title: "吴思经典三部曲",
+                author: "吴思",
+                category: "政治学",
+                desc: "吴思历史经典三部曲：潜规则+血酬定律+我想重新解释历史",
+                img: "images/21.jpg",
+                file: "books/吴思历史经典三部曲-(潜规则+血酬定律+我想重新解释历史).epub"
+            }
+              ,
+            {
+                title: "君主论",
+                author: "马基雅维利",
+                category: "政治学",
+                desc: "拿破仑一世批注版本",
+                img: "images/22.jpg",
+                file: "books/君主论.epub"
+            }
+                          ,
+            {
+                title: "中县干部",
+                author: "冯军旗",
+                category: "政治学",
+                desc: "中县干部",
+                img: "images/中县干部.jpg",
+                file: "books/中县干部.pdf"
+            }
+                                      ,
+            {
+                title: "晚年周恩来",
+                author: "高文谦",
+                category: "传记",
+                desc: "周恩来的最后十年",
+                img: "images/23.jpg",
+                file: "books/晚年周恩来.epub"
+            }
+                                      ,
+            {
+                title: "赵紫阳回忆录",
+                author: "赵紫阳",
+                category: "回忆录",
+                desc: "赵紫阳回忆改革历程",
+                img: "images/24.jpg",
+                file: "books/赵紫阳回忆录.epub"
+            }
+                                                  ,
+            {
+                title: "中央帝国密码三部曲",
+                author: "郭建龙",
+                category: "政治",
+                desc: "中央帝国的财政、军事和哲学密码",
+                img: "images/25.jpg",
+                file: "books/中央帝国密码三部曲.epub"
+            }
+                 ,
+            {
+                title: "一滴泪-从肃反到文革的回忆",
+                author: "巫宁坤",
+                category: "回忆录",
+                desc: "一滴泪，一位学者的回忆录",
+                img: "images/26.jpg",
+                file: "books/一滴泪-从肃反到文革的回忆.mobi"
+            }
+                          ,
+            {
+                title: "罗瑞卿倒台之谜",
+                author: "温相",
+                category: "传记",
+                desc: "罗瑞卿大将倒台的前因后果",
+                img: "images/27.jpg",
+                file: "books/罗瑞卿倒台之谜.pdf"
+            }
+                                      ,
+            {
+                title: "毛泽东鲜为人知的故事",
+                author: "张戎",
+                category: "传记",
+                desc: "毛泽东鲜为人知的故事",
+                img: "images/28.jpg",
+                file: "books/毛泽东鲜为人知的故事.pdf"
+            }
+                   ,
+            {
+                title: "李作鹏回忆录",
+                author: "李作鹏",
+                category: "回忆录",
+                desc: "解放军前副总参谋长李作鹏中将的回忆录",
+                img: "images/29.jpg",
+                file: "books/李作鹏回忆录.epub"
+            }
+                               ,
+            {
+                title: "亦云回忆",
+                author: "沈亦云",
+                category: "回忆录",
+                desc: "黄郛夫人沈亦云的回忆录",
+                img: "images/30.jpeg",
+                file: "books/亦云回忆.epub"
+            }
+                                           ,
+            {
+                title: "李锐口述往事",
+                author: "李锐",
+                category: "回忆录",
+                desc: "毛泽东秘书李锐的回忆录",
+                img: "images/31.jpg",
+                file: "books/李锐口述往事.epub"
+            }
+                                                       ,
+            {
+                title: "吴法宪回忆录",
+                author: "吴法宪",
+                category: "回忆录",
+                desc: "解放军前空军司令吴法宪的回忆录",
+                img: "images/32.jpg",
+                file: "books/岁月艰难-吴法宪回忆录.epub"
+            }
+                     ,
+            {
+                title: "张国焘夫人回忆录",
+                author: "杨子烈",
+                category: "回忆录",
+                desc: "张国焘夫人杨子烈的回忆录",
+                img: "images/33.png",
+                file: "books/张国焘夫人回忆录.epub"
+            }
+                                 ,
+            {
+                title: "台湾中研院口述民国历史经典丛书",
+                author: "中研院",
+                category: "回忆录",
+                desc: "台湾中研院口述民国历史8册",
+                img: "images/34.jpg",
+                file: "books/台湾中研院口述民国历史经典丛书.epub"
+            }
+                                             ,
+            {
+                title: "翦商-殷周之变与华夏新生",
+                author: "李硕",
+                category: "历史",
+                desc: "了解殷商社会入门读物",
+                img: "images/35.jpg",
+                file: "books/翦商-殷周之变与华夏新生.epub"
+            }
+                                                         ,
+            {
+                title: "南明史",
+                author: "顾城",
+                category: "历史",
+                desc: "明清之际",
+                img: "images/36.jpg",
+                file: "books/南明史.epub"
+            }
+                    ,
+            {
+                title: "县乡中国-县域治理现代化",
+                author: "杨华",
+                category: "政治",
+                desc: "介绍中国县乡治理",
+                img: "images/37.jpg",
+                file: "books/县乡中国-县域治理现代化.epub"
+            }
+            // 在这里继续添加更多书籍...
+        ];
+
+        // ==================== 生成分类按钮和图书卡片 ====================
+        function renderBooks(filteredBooks) {
+            const container = document.getElementById('books');
+            container.innerHTML = '';
+
+            filteredBooks.forEach(book => {
+                const card = `
+                <div class="book-card bg-zinc-900 rounded-3xl overflow-hidden" data-category="${book.category}">
+                    <img src="${book.img}" alt="${book.title}" class="w-full h-80 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold mb-1">${book.title}</h3>
+                        <p class="text-emerald-400 mb-4">${book.author} · ${book.category}</p>
+                        <p class="text-zinc-400 text-sm mb-6 line-clamp-3">${book.desc}</p>
+                        <a href="${book.file}" 
+                           class="block text-center bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-medium">
+                            📥 下载 EPUB
+                        </a>
+                    </div>
+                </div>`;
+                container.innerHTML += card;
+            });
+        }
+
+        function createCategoryButtons() {
+            const categories = ['all', ...new Set(books.map(b => b.category))];
+            const container = document.getElementById('category-filters');
+            container.innerHTML = '';
+
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.textContent = cat === 'all' ? '全部' : cat;
+                btn.className = `px-6 py-3 rounded-2xl text-sm font-medium ${cat === 'all' ? 'active bg-emerald-600' : 'bg-zinc-800 hover:bg-zinc-700'}`;
+                btn.onclick = () => filterCategory(cat);
+                container.appendChild(btn);
+            });
+        }
+
+        function filterCategory(category) {
+            // 高亮当前按钮
+            document.querySelectorAll('#category-filters button').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (category === 'all' && btn.textContent === '全部') || 
+                    btn.textContent === category);
+            });
+
+            const filtered = category === 'all' 
+                ? books 
+                : books.filter(book => book.category === category);
+            
+            renderBooks(filtered);
+        }
+
+        // 初始化
+        createCategoryButtons();
+        renderBooks(books);
+    </script>
+</body>
+</html>
